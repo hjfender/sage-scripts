@@ -1,9 +1,9 @@
 #for testing purposes
-F1 = PolynomialRing(CC, 'x', 2)
-V1 = VectorSpace(CC, 2)
-R1 = RootSystem(['A',2])
-L1 = R1.root_lattice()
-W1 = L1.weyl_group()
+F = PolynomialRing(CC, 'x', 2)
+V = VectorSpace(CC, 2)
+R = RootSystem(['A',2])
+L = R1.root_lattice()
+W = L1.weyl_group()
 
 #generate complex monomial based off of a member of the root lattice
 #
@@ -59,51 +59,80 @@ def j(w, L):
 
 #Weyl group action on polynomial ring
 
+# def sigma_action(i, f, W, F):
+#     n = len(F.gens())
+#     q = var('q')
+#     sr = W.simple_reflections()
+#     inputs = {}
+#     for j in range(0,n):
+#         if i == j:
+#             inputs[F.gen(j)] = (1/(q*F.gen(j)))
+#         elif (sr[i+1] * sr[j+1])^3 == W.random_element_of_length(0):
+#             inputs[F.gen(j)] = F.gen(i)*F.gen(j)*sqrt(q)
+#         else:
+#             inputs[F.gen(j)] = F.gen(j)
+#     return substitute(f, inputs)
+
 #Sigma action
-def sigma_action(i, f, W, F):
-    n = len(F.gens())
-    q = var('q') #this converts everything to a symbolic ring
+def sigma_action(i, v, W):
+    q = var('q')
     sr = W.simple_reflections()
-    inputs = {}
-    for j in range(0,n):
+    w = []
+    for j in range(0, len(v)):
         if i == j:
-            inputs[F.gen(j)] = (1/(q*F.gen(j)))
+            w.append(1/(q*v[j]))
         elif (sr[i+1] * sr[j+1])^3 == W.random_element_of_length(0):
-            inputs[F.gen(j)] = F.gen(i)*F.gen(j)*sqrt(q)
-        else:
-            inputs[F.gen(j)] = F.gen(j)
-    return substitute(f, inputs)
+            w.append(v[j]*v[i]*sqrt(q))
+    return w
+
+# def epsilon_action(i, f, W, F):
+#     n = len(F.gens())
+#     sr = W.simple_reflections()
+#     inputs = {}
+#     for j in range(0,n):
+#         if (sr[i+1] * sr[j+1])^3 == W.random_element_of_length(0):
+#             inputs[F.gen(j)] = -F.gen(j)
+#         else:
+#             inputs[F.gen(j)] = F.gen(j)
+#     return substitute(f, inputs)
 
 #Epsilon action
 #i - ith action
-#f - polynomial
+#v - array of complex numbers
 #W - Weyl group
-def epsilon_action(i, f, W, F):
-    n = len(F.gens())
+def epsilon_action(i, v, W):
     sr = W.simple_reflections()
-    inputs = {}
-    for j in range(0,n):
+    w = []
+    for j in range(0, len(v)):
         if (sr[i+1] * sr[j+1])^3 == W.random_element_of_length(0):
-            inputs[F.gen(j)] = -F.gen(j)
-        else:
-            inputs[F.gen(j)] = F.gen(j)
-    return substitute(f, inputs)
+            w.append(-v[j])
+    return w
+
+def f_plus(i, v, f, W):
+    return (evaluate(f, v) + evaluate(f, epsilon_action(i, v, W)))/2
+
+def f_minus(i, v, f, W):
+    return (evaluate(f, v) - evaluate(f, epsilon_action(i, v, W)))/2
 
 #i - ith action
 #f - polynomial
 #W - Weyl group
+#F - corresponding polynomial ring
 def weyl_action_by_simple_reflection(i, f, W, F):
-    fplus = (f + epsilon_action(i, f, W, F))/2
-    fminus = (f - epsilon_action(i, f, W, F))/2
     q = var('q')
-    return (-(1-q*F.gen(i))/(q*F.gen(i)*(1-F.gen(i))))*sigma_action(i, fplus, W, F) + (1/(F.gen(i)*sqrt(q)))*sigma_action(i, fminus, W, F)
+    v = []
+    for x in F.gens():
+        v.append(x)
+    A = (-(1-q*v[i]))/((q*v[i])*(1-v[i]))
+    B = (1/(v[i]*sqrt(q)))
+    return A*f_plus(i, v, evaluate(f, sigma_action(i, v, W)), W) + B*f_minus(i, v, evaluate(f, sigma_action(i, v, W)), W)
 
 #w - Weyl group element
 def weyl_action(w, f, W, F):
     word = w.reduced_word()
     word.reverse()
     for i in word:
-        f = weyl_action_by_simple_reflection(i-1,f,W,F)
+        f = weyl_action_by_simple_reflection(i-1, f, W, F)
     return f
 
 #THE POLYNOMIAL PROPER
@@ -118,7 +147,9 @@ def f_0(L):
 def W_invariant_polynomial(L):
     return f_0(L)/get_delta_polynomial(L)
 
-#helpers - needed because f can be a member of CC[x1,x2,...] or SR
+#helpers
+
+#needed because f can be a member of CC[x1,x2,...] or SR
 #and those rings behave differently with respect to substitution
 def substitute(f, inputs):
     if f.parent() == SR:
@@ -131,3 +162,18 @@ def substitute(f, inputs):
         return f
     else:
         return f.subs(inputs)
+
+#needed because sigma and epsilon actions are defined on vectors (which here is an array)
+#the symbolic ring has no way to evaluate a function on an array especially with 'q' thrown into the mix
+def evaluate(f, v):
+    if f.parent() == SR:
+        n = len(f.variables())
+        if var('q') in f.variables():
+            n = n - 1
+        for i in range(0, n):
+            x = var('x'+str(i))
+            f = f.function(x)
+            f = f(v[i])
+        return f
+    else:
+        return f(v)
