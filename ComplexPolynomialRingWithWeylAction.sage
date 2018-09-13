@@ -18,17 +18,10 @@ class ComplexPolynomialRingWithWeylAction:
             p = p*(v[i])^(a.coefficient(i+1))
         return p
 
-    #Generate a list of symbolic variables one for each dimension of the lattice
-    def v(self):
-        v = []
-        for i in range(0,self.lattice.dimension()):
-            v.append(var('x'+str(i)))
-        return v
-
     #Generate half sum of positive roots of lattice
     def half_sum_positive_roots(self):
         return sum(self.lattice.positive_roots()).map_coefficients(lambda x : ZZ((1/2)*x))
-
+    
     #Action on symbolic variables by simple reflections
     def sigma_action(self, i, v):
         q = var('q')
@@ -96,7 +89,7 @@ class ComplexPolynomialRingWithWeylAction:
         q = var('q')
         for a in self.lattice.positive_roots():
             cfs = a.coefficients()
-            p = p * (1 - q^sum(cfs) * self.x(a))
+            p = p * (1 - q^sum(cfs) * self.x(2*a))
         return p
 
     #Find j based on shortcuts in the paper
@@ -112,21 +105,30 @@ class ComplexPolynomialRingWithWeylAction:
             cfs = a.coefficients()
             return (-1)^len(rw) * q^(sum(cfs)) * self.x(2*a)
 
-    #Calculate j from scratch
-    def calc_j(self, w):
-        v = self.v()
-        return self.delta()/self.evaluate(self.delta(),self.w_action(w,v))
-
-    def f_0(self):
-        f0 = 0
-        one = F.polynomial_ring(1)
+    def f0(self):
+        f0 = []
+        one = self.one()
         for w in self.weyl_group.list():
-            f0 += self.j(w) * self.weyl_action(w, one)
-        return f0
+            g = self.j(w) * self.weyl_action(w, one)
+            f0.append(g)
+        return sum(f0)
 
     #Find the invariant polynomial
-    def W_invariant_polynomial(self):
-        return self.f_0()/self.delta()
+    def w_invariant_polynomial(self):
+        return self.f0()/self.delta()
+
+    #Generate a list of symbolic variables one for each dimension of the lattice
+    def v(self):
+        v = []
+        for i in range(0,self.lattice.dimension()):
+            v.append(var('x'+str(i)))
+        return v
+
+    #Create the constant symbolic function 1
+    def one(self):
+        v = self.v()
+        one = SR(1)
+        return one.function(*v)
 
     #evaluate a function in the ring agains a list of variables representing [x0,x1,...,xn]
     def evaluate(self, f, v):
@@ -140,4 +142,7 @@ class ComplexPolynomialRingWithWeylAction:
                 f = f(v[i])
             return f
         else:
-            return f(v)
+            try:
+                return f(v)
+            except:
+                return f(*v)
