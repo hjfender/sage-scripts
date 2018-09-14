@@ -40,13 +40,10 @@ def v(n):
 #compute j from scratch
 #w - Weyl Group element
 #L - root lattice
-# def calc_j(w, L, F):
-#     d = get_delta_polynomial(L)
-#     inputs = {}
-#     for i in range(0, L.dimension()):
-#         inputs[F.gen(i)] = weyl_action(w, F.gen(i), L.weyl_group(), F)
-#     print(inputs)
-#     return d/substitute(d, inputs)
+def calc_j(w, L):
+    d = delta(L)
+    vrs = v(L.dimension())
+    return d/evaluate(d, w_action(w, vrs, W))
 
 #return j based on shortcuts in the paper
 def j(w, L):
@@ -59,7 +56,7 @@ def j(w, L):
         a = a - w.inverse().action(a)
         b = 2 * a
         cfs = a.coefficients()
-        return (-1)^len(rw) * q^(sum(cfs)) * get_complex_monomial(2*a)
+        return (-1)^len(rw) * q^(sum(cfs)) * x(2*a)
 
 #Weyl group action on polynomial ring
 
@@ -76,6 +73,14 @@ def sigma_action(i, v, W):
         else:
             w.append(v[j])
     return w
+
+#W action
+def w_action(w, v, W):
+    word = w.reduced_word()
+    word.reverse()
+    for i in word:
+        v = sigma_action(i-1, v, W)
+    return v
 
 #Epsilon action
 #i - ith action
@@ -103,12 +108,10 @@ def f_minus(i, v, f, W):
 #F - corresponding polynomial ring
 def weyl_action_by_simple_reflection(i, f, W, F):
     q = var('q')
-    v = []
-    for x in F.gens():
-        v.append(x)
-    A = (-(1-q*v[i]))/((q*v[i])*(1-v[i]))
-    B = (1/(v[i]*sqrt(q)))
-    return A*f_plus(i, v, evaluate(f, sigma_action(i, v, W)), W) + B*f_minus(i, v, evaluate(f, sigma_action(i, v, W)), W)
+    vrs = v(len(F.gens()))
+    A = (-(1-q*vrs[i])/((q*vrs[i])*(1-vrs[i])))
+    B = (1/(vrs[i]*sqrt(q)))
+    return A*f_plus(i, vrs, evaluate(f, sigma_action(i, vrs, W)), W) + B*f_minus(i, vrs, evaluate(f, sigma_action(i, vrs, W)), W)
 
 #w - Weyl group element
 def weyl_action(w, f, W, F):
@@ -131,20 +134,6 @@ def W_invariant_polynomial(L):
     return f_0(L)/get_delta_polynomial(L)
 
 #helpers
-
-#needed because f can be a member of CC[x1,x2,...] or SR
-#and those rings behave differently with respect to substitution
-def substitute(f, inputs):
-    if f.parent() == SR:
-        vrs = f.variables()
-        for v in vrs:
-            for k in inputs:
-                if str(k) == str(v):
-                    f = f.subs({v : inputs[k]})
-                    break
-        return f
-    else:
-        return f.subs(inputs)
 
 #needed because sigma and epsilon actions are defined on vectors (which here is an array)
 #the symbolic ring has no way to evaluate a function on an array especially with 'q' thrown into the mix
