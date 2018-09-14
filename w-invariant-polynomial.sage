@@ -16,7 +16,7 @@ def x(a):
         p = p*(var('x'+str(i)))^(a.coefficient(i+1))
     return p
 
-#generate complex delta polynomial based off of a given lattice
+#generate the complex delta polynomial based off of a given lattice
 #for a root system
 def delta(L):
     p = 1
@@ -83,9 +83,6 @@ def w_action(w, v, W):
     return v
 
 #Epsilon action
-#i - ith action
-#v - array of complex numbers
-#W - Weyl group
 def epsilon_action(i, v, W):
     sr = W.simple_reflections()
     w = []
