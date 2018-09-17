@@ -7,7 +7,7 @@ W = L.weyl_group()
 
 #generate complex monomial based off of a member of the root lattice
 #
-#I assume that 'm' is a linear combination of the basis elements of
+#I assume that 'a' is a linear combination of the basis elements of
 #the root lattice
 def x(a):
     n = a.parent().dimension()
@@ -128,20 +128,6 @@ def W_invariant_polynomial(L):
     return f_0(L)/get_delta_polynomial(L)
 
 #helpers
-
-#needed because f can be a member of CC[x1,x2,...] or SR
-#and those rings behave differently with respect to substitution
-def substitute(f, inputs):
-    if f.parent() == SR:
-        vrs = f.variables()
-        for v in vrs:
-            for k in inputs:
-                if str(k) == str(v):
-                    f = f.subs({v : inputs[k]})
-                    break
-        return f
-    else:
-        return f.subs(inputs)
 
 #needed because sigma and epsilon actions are defined on vectors (which here is an array)
 #the symbolic ring has no way to evaluate a function on an array especially with 'q' thrown into the mix
