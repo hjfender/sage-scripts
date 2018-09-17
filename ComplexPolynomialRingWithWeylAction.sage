@@ -154,21 +154,3 @@ class ComplexPolynomialRingWithWeylAction:
                 return f(v)
             except:
                 return f(*v)
-    
-    #needed because sage can't seem to do it by itself
-    def simplify(self, f):
-        inputs = [0 for i in range(0,len(xs))]
-        for i in range(0,len(xs)):
-            inputs[i] = v[i]
-            if i != 0:
-                inputs[i-1] = 0
-            g = self.evaluate(f,inputs)
-            g_simp = g.simplify_full()
-            print str(g) + " and " + str(g_simp)
-            f = ((f/g)*g_simp).simplify_full()
-            print "Sub " + str(f)
-        # return f
-
-#FOR TESTING PURPOSES
-R = RootSystem(['A', 2])
-F = ComplexPolynomialRingWithWeylAction(R)
