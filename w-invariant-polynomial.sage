@@ -2,35 +2,40 @@
 F = PolynomialRing(CC, 'x', 2)
 V = VectorSpace(CC, 2)
 R = RootSystem(['A',2])
-L = R1.root_lattice()
-W = L1.weyl_group()
+L = R.root_lattice()
+W = L.weyl_group()
 
 #generate complex monomial based off of a member of the root lattice
 #
 #I assume that 'a' is a linear combination of the basis elements of
 #the root lattice
-def get_complex_monomial(a):
+def x(a):
     n = a.parent().dimension()
-    F = PolynomialRing(CC, 'x', n)
     p = 1
     for i in range(0,n):
-        k = a.coefficient(i+1)
-        p = p*(F.gen(i))^(a.coefficient(i+1))
+        p = p*(var('x'+str(i)))^(a.coefficient(i+1))
     return p
 
-#generate complex delta polynomial based off of a given lattice
+#generate the complex delta polynomial based off of a given lattice
 #for a root system
-def get_delta_polynomial(L):
+def delta(L):
     p = 1
     q = var('q')
     for a in L.positive_roots():
         cfs = a.coefficients()
-        p = p * (1 - q^sum(cfs) * get_complex_monomial(a))
+        p = p * (1 - q^sum(cfs) * x(a))
     return p
 
 #generate half sum of positive roots of lattice
 def half_sum_positive_roots(L):
     return sum(L.positive_roots()).map_coefficients(lambda x : ZZ((1/2)*x))
+
+#generate a list of symbolic variables n long
+def v(n):
+    v = []
+    for i in range(0,n):
+        v.append(var('x'+str(i)))
+    return v
 
 #compute j from scratch
 #w - Weyl Group element
@@ -46,10 +51,9 @@ def half_sum_positive_roots(L):
 #return j based on shortcuts in the paper
 def j(w, L):
     rw = w.reduced_word()
-    F = PolynomialRing(CC, 'x', L.dimension())
     q = var('q')
     if len(rw) == 1:
-        return -q*F.gen(rw[0]-1)^2
+        return -q*var('x'+str(rw[0]-1))^2
     else:
         a = half_sum_positive_roots(L)
         a = a - w.inverse().action(a)
@@ -69,18 +73,19 @@ def sigma_action(i, v, W):
             w.append(1/(q*v[j]))
         elif (sr[i+1] * sr[j+1])^3 == W.random_element_of_length(0):
             w.append(v[j]*v[i]*sqrt(q))
+        else:
+            w.append(v[j])
     return w
 
 #Epsilon action
-#i - ith action
-#v - array of complex numbers
-#W - Weyl group
 def epsilon_action(i, v, W):
     sr = W.simple_reflections()
     w = []
     for j in range(0, len(v)):
         if (sr[i+1] * sr[j+1])^3 == W.random_element_of_length(0):
             w.append(-v[j])
+        else:
+            w.append(v[j])
     return w
 
 def f_plus(i, v, f, W):
