@@ -7,15 +7,15 @@ W = L1.weyl_group()
 
 #generate complex monomial based off of a member of the root lattice
 #
-#I assume that 'm' is a linear combination of the basis elements of
+#I assume that 'a' is a linear combination of the basis elements of
 #the root lattice
-def get_complex_monomial(m):
-    n = m.parent().dimension()
+def get_complex_monomial(a):
+    n = a.parent().dimension()
     F = PolynomialRing(CC, 'x', n)
     p = 1
     for i in range(0,n):
-        k = m.coefficient(i+1)
-        p = p*(F.gen(i))^(m.coefficient(i+1))
+        k = a.coefficient(i+1)
+        p = p*(F.gen(i))^(a.coefficient(i+1))
     return p
 
 #generate complex delta polynomial based off of a given lattice
@@ -59,20 +59,6 @@ def j(w, L):
 
 #Weyl group action on polynomial ring
 
-# def sigma_action(i, f, W, F):
-#     n = len(F.gens())
-#     q = var('q')
-#     sr = W.simple_reflections()
-#     inputs = {}
-#     for j in range(0,n):
-#         if i == j:
-#             inputs[F.gen(j)] = (1/(q*F.gen(j)))
-#         elif (sr[i+1] * sr[j+1])^3 == W.random_element_of_length(0):
-#             inputs[F.gen(j)] = F.gen(i)*F.gen(j)*sqrt(q)
-#         else:
-#             inputs[F.gen(j)] = F.gen(j)
-#     return substitute(f, inputs)
-
 #Sigma action
 def sigma_action(i, v, W):
     q = var('q')
@@ -84,17 +70,6 @@ def sigma_action(i, v, W):
         elif (sr[i+1] * sr[j+1])^3 == W.random_element_of_length(0):
             w.append(v[j]*v[i]*sqrt(q))
     return w
-
-# def epsilon_action(i, f, W, F):
-#     n = len(F.gens())
-#     sr = W.simple_reflections()
-#     inputs = {}
-#     for j in range(0,n):
-#         if (sr[i+1] * sr[j+1])^3 == W.random_element_of_length(0):
-#             inputs[F.gen(j)] = -F.gen(j)
-#         else:
-#             inputs[F.gen(j)] = F.gen(j)
-#     return substitute(f, inputs)
 
 #Epsilon action
 #i - ith action
@@ -148,20 +123,6 @@ def W_invariant_polynomial(L):
     return f_0(L)/get_delta_polynomial(L)
 
 #helpers
-
-#needed because f can be a member of CC[x1,x2,...] or SR
-#and those rings behave differently with respect to substitution
-def substitute(f, inputs):
-    if f.parent() == SR:
-        vrs = f.variables()
-        for v in vrs:
-            for k in inputs:
-                if str(k) == str(v):
-                    f = f.subs({v : inputs[k]})
-                    break
-        return f
-    else:
-        return f.subs(inputs)
 
 #needed because sigma and epsilon actions are defined on vectors (which here is an array)
 #the symbolic ring has no way to evaluate a function on an array especially with 'q' thrown into the mix
