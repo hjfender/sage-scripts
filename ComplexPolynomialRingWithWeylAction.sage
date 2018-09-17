@@ -9,6 +9,12 @@ class ComplexPolynomialRingWithWeylAction:
         self.weyl_group = self.lattice.weyl_group()
         self.polynomial_ring = PolynomialRing(CC, 'x', self.lattice.dimension())
 
+    def __str__(self):
+        return str(self.polynomial_ring) + " endowed with an action by " + str(self.weyl_group)
+
+    def __repr__(self):
+        return str(self)
+
     #Generate monomial based off of a member of the root lattice
     #I assume that 'm' is a linear combination of the basis elements of the root lattice
     def x(self, a):
@@ -76,10 +82,10 @@ class ComplexPolynomialRingWithWeylAction:
     #w - Weyl group element
     def weyl_action(self, w, f):
         word = w.reduced_word()
-        word.reverse()
+        # word.reverse() #right action or left action???
         for i in word:
             f = self.weyl_action_by_simple_reflection(i-1, f)
-        return f
+        return self.evaluate(f,self.v())
 
     #Helpful for finding the invariant polynomial
 
@@ -111,11 +117,11 @@ class ComplexPolynomialRingWithWeylAction:
         for w in self.weyl_group.list():
             g = self.j(w) * self.weyl_action(w, one)
             f0.append(g)
-        return sum(f0)
+        return sum(f0).simplify_full()
 
     #Find the invariant polynomial
-    def w_invariant_polynomial(self):
-        return self.f0()/self.delta()
+    def weyl_invariant_polynomial(self):
+        return (self.f0()/self.delta()).simplify_full()
 
     #Generate a list of symbolic variables one for each dimension of the lattice
     def v(self):
@@ -134,10 +140,11 @@ class ComplexPolynomialRingWithWeylAction:
     def evaluate(self, f, v):
         if f.parent() == SR:
             n = len(f.variables())
+            vrs = self.v()
             if var('q') in f.variables():
                 n = n - 1
             for i in range(0, n):
-                x = var('x'+str(i))
+                x = vrs[i]
                 f = f.function(x)
                 f = f(v[i])
             return f
@@ -146,3 +153,21 @@ class ComplexPolynomialRingWithWeylAction:
                 return f(v)
             except:
                 return f(*v)
+    
+    #needed because sage can't seem to do it by itself
+    def simplify(self, f):
+        inputs = [0 for i in range(0,len(xs))]
+        for i in range(0,len(xs)):
+            inputs[i] = v[i]
+            if i != 0:
+                inputs[i-1] = 0
+            g = self.evaluate(f,inputs)
+            g_simp = g.simplify_full()
+            print str(g) + " and " + str(g_simp)
+            f = ((f/g)*g_simp).simplify_full()
+            print "Sub " + str(f)
+        # return f
+
+#FOR TESTING PURPOSES
+R = RootSystem(['A', 2])
+F = ComplexPolynomialRingWithWeylAction(R)
