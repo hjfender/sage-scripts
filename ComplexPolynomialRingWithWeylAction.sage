@@ -105,6 +105,7 @@ class ComplexPolynomialRingWithWeylAction:
             cfs = a.coefficients()
             return (-1)^len(rw) * q^(sum(cfs)) * self.x(2*a)
 
+    #complicated factor of the polynomial
     def f0(self):
         f0 = []
         one = self.one()
