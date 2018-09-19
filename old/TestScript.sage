@@ -6,7 +6,7 @@ R = RootSystem(['A', 2])
 #################################################################
 
 #Initialize the polynomial ring off of the given root system
-F = ComplexPolynomialRingWithWeylAction(R)
+F = ComplexFieldOfRationalFunctionsWithWeylAction(R)
 print "1) Initializing " + str(F) + "\n"
 
 print "===============Miscellaneous Functionality of Polynomial Ring===============\n"
