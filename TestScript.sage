@@ -1,5 +1,5 @@
 #Change the Cartan Type to see the effects on the polynomial ring
-R = RootSystem(['A', 3])
+R = RootSystem(['C', 2])
 
 #Initialize the polynomial ring off of the given root system
 F = ComplexPolynomialRingWithWeylAction(R)
