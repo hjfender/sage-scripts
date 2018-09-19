@@ -1,6 +1,6 @@
 import sage.combinat.root_system.root_system
 
-class ComplexPolynomialRingWithWeylAction:
+class ComplexFieldOfRationalFunctionsWithWeylAction:
     """
     A class encapsulating the relevant entities used to find a special invariant
     polynomial used to construct a Multiple Dirichlet Series. Those entities are:

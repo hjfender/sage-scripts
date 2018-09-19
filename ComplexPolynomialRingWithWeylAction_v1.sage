@@ -18,54 +18,6 @@ class ComplexPolynomialRingWithWeylAction:
         return str(self)
 
     ###############################################################
-    #Methods related to the creation and manipulation
-    #of the poynomial ring generators
-    ###############################################################
-
-    def variables(self):
-        v = []
-        for i in range(0,self.lattice.dimension()):
-            v.append(var('x'+str(i)))
-        return v
-
-    def sigma_action(self, i, v):
-        if len(v) != self.lattice.dimension():
-            raise ValueError('Invalid input vector sizes.')
-        q = var('q')
-        sr = self.weyl_group.simple_reflections()
-        w = []
-        for j in range(0, len(v)):
-            if i == j:
-                w.append(1/(q*v[j]))
-            elif (sr[i+1]*sr[j+1])^3 == self.weyl_group.random_element_of_length(0):
-                w.append(v[j]*v[i]*sqrt(q))
-            else:
-                w.append(v[j])
-        return w
-
-    def w_action(self, w, v):
-        if len(v) != self.lattice.dimension():
-            raise ValueError('Invalid input vector sizes.')
-        word = w.reduced_word()
-        word.reverse()
-        u = v
-        for i in word:
-            u = self.sigma_action(i-1, u)
-        return u
-
-    def epsilon_action(self, i, v):
-        if len(v) != self.lattice.dimension():
-            raise ValueError('Invalid input vector sizes.')
-        sr = self.weyl_group.simple_reflections()
-        w = []
-        for j in range(0, len(v)):
-            if (sr[i+1] * sr[j+1])^3 == self.weyl_group.random_element_of_length(0):
-                w.append(-v[j])
-            else:
-                w.append(v[j])
-        return w
-
-    ###############################################################
     #Methods related to the weyl action on polynomials
     ###############################################################
 
@@ -155,43 +107,10 @@ class ComplexPolynomialRingWithWeylAction:
     ###############################################################
     #Rational Function Class to handle weyl action
     ###############################################################
-    class RationalFunction:
-
-        def __init__(self, rf, w, vrs):
-            self.rational_function = rf
-            self.weyl_group_element = w
-            self.variables = vrs
-            self.q = var('q')
-
-        def evaluate(self, inputs):
-            if self.polynomial.parent() == SR:
-                f = self.polynomial
-                n = len(self.variables)
-                if var('q') in f.variables():
-                    n = n - 1
-                for i in range(0, n):
-                    x = self.variables[i]
-                    f = f.function(x)
-                    f = f(inputs[i])
-                return f
-            else:
-                try:
-                    return f(inputs)
-                except:
-                    return f(*inputs)
+    
 
         def c(self, i):
             return (1/2)*((q*self.variables[i] - 1)/(q*self.variables[i]*(1 - self.variables[i])) + 1/(sqrt(q)*self.variables[i]))
 
         def d(self, i):
             return (1/2)*((q*self.variables[i] - 1)/(q*self.variables[i]*(1 - self.variables[i])) - 1/(sqrt(q)*self.variables[i]))
-
-    class Variables:
-
-        def __init__(self, n, adjacency_map):
-            self.q = var('q')
-            self.vars = []
-            for i in range(0,n):
-                self.list.append(var('x'+str(i)))
-            self.vars_after_sigma = []
-            self.vars_after_epsilon = []
