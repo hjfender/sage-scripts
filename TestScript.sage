@@ -1,61 +1,76 @@
+reset('R,F,a,w,m,v,f0,f')
+
+#################################################################
 #Change the Cartan Type to see the effects on the polynomial ring
 R = RootSystem(['C', 2])
 
 #Initialize the polynomial ring off of the given root system
 F = ComplexPolynomialRingWithWeylAction(R)
-print "Initializing " + str(F) + "\n"
+print "1) Initializing " + str(F) + "\n"
+
+print "===============Miscellaneous Functionality of Polynomial Ring===============\n"
 
 #Choose a random element of the root lattice for example purposes
 a = F.lattice.random_element()
-print "Choosing random element of the root lattice 'alpha' = " + str(a) + "\n"
+print "2) Choosing random element of the root lattice 'a' =\n" + str(a) + "\n"
+
+#Choose a random element of the root lattice for example purposes
+w = F.weyl_group.random_element()
+print "3) Choosing random element of the corresponding weyl group 'w' =\n" + str(w) + "\n(reduced word: " + str(w.reduced_word()) + ")\n"
 
 #Construct complex monomial
 m = F.x(a)
-print "Constructing complex monomial 'm' for 'alpha' (described on page 8): " + str(m) + "\n"
+print "4) Constructing complex monomial 'm' for 'a' (described on page 8):\n" + str(m) + "\n"
+
+#Find phi(w)
+print "5) Find positive roots sent to negative roots by 'w' (page 7):\n" + str(F.phi(w)) + "\n"
 
 #Load vector of generators of the polynomial ring
 v = F.v()
-print "Loading vector of generators of the polynomial ring: " + str(v) + "\n"
+print "6) Loading vector of generators of the polynomial ring:\n" + str(v) + "\n"
+
+print "===============Weyl Action on Polynomial Ring===============\n"
 
 #Act by simple reflections on the generators
-print "Acting by simple reflections on the generators of the polynomial ring (Eq. 3.8 on page 8)..."
+print "7) Acting by simple reflections on the generators of the polynomial ring (Eq. 3.8 on page 8)..."
 for i in range(0,len(v)):
     print "Reflection " + str(i) + ": " + str(F.sigma_action(i, v))
 
 print
 
 #Act by simple reflections on the generators
-print "Acting by epsilon on the generators of the polynomial ring (Eq. 3.10 on page 9)..."
+print "8) Acting by epsilon on the generators of the polynomial ring (Eq. 3.10 on page 9)..."
 for i in range(0,len(v)):
     print "Reflection " + str(i) + ": " + str(F.epsilon_action(i, v))
 
 print
 
-#Choose a random element of the root lattice for example purposes
-w = F.weyl_group.random_element()
-print "Choosing random element of the corresponding weyl group 'w' = " + str(w) + "\n"
-
 #Act by weyl group element on the generators
-print "Acting by 'w' on the generators of the polynomial ring " + str(F.w_action(w, v))
+print "9) Acting by 'w' on the generators of the polynomial ring:\n" + str(F.w_action(w, v)) +"\n"
 
 #Act on the monomial by simple reflections
-print "Acting on 'm' by simple reflections (Eq. 3.13 on page 9)..."
+print "10) Acting on 'm' by simple reflections (Eq. 3.13 on page 9)..."
 for i in range(0,len(v)):
     print "Reflection " + str(i) + ": " + str(F.weyl_action_by_simple_reflection(i, m))
 
 print
 
 #Act by weyl group element on the monomial
-print "Acting by 'w' on 'm' " + str(F.weyl_action(w, m)) + "\n"
+wm = F.weyl_action(w, m)
+print "11) Acting by 'w' on 'm':\n" + "Value saved in variable wm\n"
+
+print "===============Functionality for Constructing Invariant Polynomial===============\n"
 
 #Create delta polynomial
-print "Creating delta polynomial (page 12): " + str(F.delta()) + "\n"
+print "12) Creating delta polynomial (page 12):\n" + str(F.delta()) + "\n"
 
 #Create j polynomial
-print "Creating j polynomial for 'w' (page 12): " + str(F.j(w)) + "\n"
+print "13) Creating j polynomial for 'w' (page 12):\n" + str(F.j(w)) + "\n"
 
 #Create delta polynomial
-print "Creating f0 polynomial (eq. 3.20 page 12): " + str(F.f0()) + "\n"
+f0 = F.f0()
+print "14) Creating f0 polynomial (eq. 3.20 page 12):\n" + "Value saved in variable f0\n"
 
 #Create delta polynomial
-print "Creating invariant polynomial (eq. 3.21 page 12): " + str(F.weyl_invariant_polynomial())
+f = F.weyl_invariant_polynomial()
+print "15) Creating invariant polynomial (eq. 3.21 page 12):\n" + "Value saved in variable f"
