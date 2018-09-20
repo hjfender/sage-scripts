@@ -2,7 +2,7 @@ reset('R,F,a,w,m,v,f0,f')
 
 #################################################################
 #Change the Cartan Type to see the effects on the polynomial ring
-R = RootSystem(['C', 2])
+R = RootSystem(['A', 2])
 
 #Initialize the polynomial ring off of the given root system
 F = ComplexFieldOfRationalFunctionsWithWeylAction(R)
