@@ -239,22 +239,20 @@ class ComplexFieldOfRationalFunctionsWithWeylAction:
 
     def f0(self):
         """
-        complicated factor of the polynomial
-
-        Example:
+        Compute the f0 part of the invariant polynomial as defined in (3.20) on page 12.
         """
         f0 = []
         one = self.one()
         for w in self.weyl_group.list():
-            g = self.j(w) * self.weyl_action(w, one)
+            j = self.j(w)
+            h = self.weyl_action(w, one)
+            g = j * h
             f0.append(g)
         return sum(f0)
 
     def weyl_invariant_polynomial(self):
         """
         Compute the invariant polynomial as defined in (3.21) on page 12.
-
-        Example:
         """
         return (self.f0()/self.delta())
 
