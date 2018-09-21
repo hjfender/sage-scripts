@@ -76,12 +76,14 @@ class FieldOfRationalFunctionsWithAction:
         rw = w.reduced_word()
         v = self._variable_helper.variables
         q = self._variable_helper.q
+        j = 0
         if len(rw) == 1:
-            return -q*v[rw[0]-1]**2
+            j = -q*v[rw[0]-1]**2
         else:
             a = sum(self.phi(w))
             cfs = a.coefficients()
-            return (-1)**len(rw) * q**(sum(cfs)) * self.x(2*a).original_function
+            j = (-1)**len(rw) * q**(sum(cfs)) * self.x(2*a).original_function
+        return j
 
     def f0(self):
         """

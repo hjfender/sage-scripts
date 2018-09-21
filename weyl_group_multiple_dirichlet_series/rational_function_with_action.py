@@ -102,10 +102,10 @@ class RationalFunctionWithAction:
     ###############################################################
     def evaluate(self, inputs, evaluate_original_function=False):
         """
-        Using the evaluate function provided in the variable helper evaluate the function
-        against a set of inputs. There are two functions one can evaluate against, the 
-        original and the transformed (after action has been applied) function, which one is
-        specified by the optional parameter.
+        Using the evaluate function provided in the variable helper, evaluate the function
+        against a set of inputs. There are two functions that can be evaluated against, the 
+        original function and the transformed (i.e. after action has been applied) function,
+        which one is specified by the optional parameter.
 
         Example:
             sage: f.original_function
@@ -128,6 +128,18 @@ class RationalFunctionWithAction:
             return self._variable_helper._evaluate(inputs, self.original_function)
         else:
             return self._variable_helper._evaluate(inputs, self.transformed_function)
+
+    def simplify(self, simplify_original_function=False):
+        """
+        A method to simplify and return one of the encapsulated functions. The choice of function
+        is based on tne optional parameter.
+        """
+        if simplify_original_function:
+            self.original_function = self.original_function.simplify_full()
+            return self.original_function
+        else:
+            self.transformed_function = self.transformed_function.simplify_full()
+            return self.transformed_function
 
 class WeylAction:
     """

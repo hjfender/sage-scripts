@@ -6,7 +6,7 @@ from weyl_group_multiple_dirichlet_series.field_of_rational_functions_with_actio
 
 #############################################################################
 #Change the Cartan Type to see the effects on the field of rational functions
-R = RootSystem(['A', 2])
+R = RootSystem(['A', 4])
 #############################################################################
 
 #Initialize the field of rational functions off of the given root system
@@ -97,7 +97,7 @@ for i in range(0,len(v)):
 print
 
 #Act on the monomial by simple reflections
-print "11) Acting on 'm' by simple reflections (Eq. 3.13 on page 9)..."
+print "11) Acting on 'm' by simple reflections (Eq. 3.14 on page 9)..."
 for u in W.simple_reflections():
     print "Reflection " + str(u.reduced_word()) + ": " + str(m.act(u))
 
@@ -115,7 +115,9 @@ print "13) Creating delta function (page 12):\n" + str(F.delta()) + "\n"
 #Create j function
 print "14) Creating every possible 'j' function (page 12)..."
 for w in W.list():
-    print str(w.reduced_word) + ": " + str(F.j(w))
+    print str(w.reduced_word()) + ": " + str(F.j(w))
+
+print
 
 #Create delta function
 f0 = F.f0()
