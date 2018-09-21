@@ -88,6 +88,15 @@ class RationalFunctionWithAction:
         self.weyl_group_element = self.weyl_group_element * w
         return self._transform()
 
+    def reset(self):
+        """
+        Reset the transformed functon to the original function and the weyl group
+        element to the identity.
+        """
+        self.transformed_function = self.original_function
+        self.weyl_group_element = self._variable_helper.weyl_group.random_element_of_length(0)
+        self.is_transformed = True
+
     ###############################################################
     #Function related methods
     ###############################################################
