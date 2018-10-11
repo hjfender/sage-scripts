@@ -6,7 +6,7 @@ from weyl_group_multiple_dirichlet_series.field_of_rational_functions_with_actio
 
 #############################################################################
 #Change the Cartan Type to see the effects on the field of rational functions
-R = RootSystem(['A', 4])
+R = RootSystem(['A', 2])
 #############################################################################
 
 #Initialize the field of rational functions off of the given root system
