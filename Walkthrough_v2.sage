@@ -1,16 +1,14 @@
 reset()
 
-from weyl_group_multiple_dirichlet_series.variable_helper import *
-from weyl_group_multiple_dirichlet_series.rational_function_with_action import *
-from weyl_group_multiple_dirichlet_series.field_of_rational_functions_with_action import *
+from weyl_group_multiple_dirichlet_series_v2.field_of_rational_functions_with_weyl_action import *
 
 #############################################################################
 #Change the Cartan Type to see the effects on the field of rational functions
-R = RootSystem(['A', 4])
+R = RootSystem(['A', 3])
 #############################################################################
 
 #Initialize the field of rational functions off of the given root system
-F = FieldOfRationalFunctionsWithAction(R)
+F = FieldOfRationalFunctionsWithWeylAction(R)
 print "1) Initializing " + str(F) + "\n"
 
 L = F.lattice
@@ -34,22 +32,22 @@ print "4) Constructing complex monomial 'm' for 'a' (described on page 8):\n" + 
 print "5) Find positive roots sent to negative roots by 'w' (page 7):\n" + str(F.phi(w)) + "\n"
 
 #Load vector of generators of the field
-v = F._variable_helper.variables
+v = [x for x in F.variable_names()]
 print "6) Loading vector of generators of the field of rational functions:\n" + str(v) + "\n"
 
 print "===============Weyl Action on Field of Rational Functions===============\n"
 
 #Act by simple reflections on the generators
 print "7) Acting by simple reflections on the generators of the field of rational functions (Eq. 3.8 on page 8)..."
-for i in range(0,len(v)):
-    print "Reflection " + str(i) + ": " + str(F._variable_helper.act_on_variables("s"+str(i)))
+for i in range(1,len(v)):
+    print "Reflection " + str(i) + ": " + str(F.act_on_variables("s"+str(i)))
 
 print
 
 #Act by epsilon on the generators
 print "8) Acting by epsilon on the generators of the field of rational functions (Eq. 3.10 on page 9)..."
-for i in range(0,len(v)):
-    print "Action " + str(i) + ": " + str(F._variable_helper.act_on_variables("e"+str(i)))
+for i in range(1,len(v)):
+    print "Action " + str(i) + ": " + str(F.act_on_variables("e"+str(i)))
 
 print
 
@@ -57,54 +55,67 @@ print
 print "9) Checking the relations (3.9) on page 9..."
 sr = W.simple_reflections()
 identity = W.random_element_of_length(0)
-for i in range(0,len(v)):
+for i in range(1,len(v)):
     for j in range(i,len(v)):
-        if (i != j and (sr[i+1] * sr[j+1])**3 == identity):
+        if (i != j and (sr[i] * sr[j])**3 == identity):
+            sisjsi = F.act_on_variables("s"+str(i)+"s"+str(j)+"s"+str(i))
+            sjsisj = F.act_on_variables("s"+str(j)+"s"+str(i)+"s"+str(j))
             print str(i) + " and " + str(j) + " are adjacent..." 
             print ("\ts" + str(i) + "s" + str(j) + "s" + str(i) + "x" \
-                + " = " + str(F._variable_helper.act_on_variables("s"+str(i)+"s"+str(j)+"s"+str(i))))
+                + " = " + str(sisjsi))
             print ("\ts" + str(j) + "s" + str(i) + "s" + str(j) + "x" \
-                + " = " + str(F._variable_helper.act_on_variables("s"+str(j)+"s"+str(i)+"s"+str(j))))
+                + " = " + str(sjsisj))
+            # print "\tEqual!" if sisjsi == sjsisj else "\tNot Equal!"
         elif i != j:
+            sisj = F.act_on_variables("s"+str(j)+"s"+str(i))
+            sjsi = F.act_on_variables("s"+str(i)+"s"+str(j))
             print str(i) + " and " + str(j) + " are not adjacent..."
             print ("\ts" + str(i) + "s" + str(j) + "x" \
-                + " = " + str(F._variable_helper.act_on_variables("s"+str(j)+"s"+str(i))))
+                + " = " + str(sisj))
             print ("\ts" + str(j) + "s" + str(i) + "x" \
-                + " = " + str(F._variable_helper.act_on_variables("s"+str(i)+"s"+str(j))))
+                + " = " + str(sjsi))
+            # print "\tEqual!" if sisj == sjsi else "\tNot Equal!"
         else:
+            sisi = F.act_on_variables("s"+str(i)+"s"+str(j))
             print str(i) + " and " + str(j) + " are equal..."
             print ("\ts" + str(i) + "s" + str(j) + "x" \
-                + " = " + str(F._variable_helper.act_on_variables("s"+str(i)+"s"+str(j))))
+                + " = " + str(sisi))
+            # print "\tEqual to Identity!" if sisi == v else "\tNot Equal to Identity!"
 
 print
 
 print "10) Checking the relations (3.11) on page 9..."
-for i in range(0,len(v)):
-    for j in range(0,len(v)):
-        if (i != j and (sr[i+1] * sr[j+1])**3 == identity):
+for i in range(1,len(v)):
+    for j in range(1,len(v)):
+        siej = F.act_on_variables("e"+str(j)+"s"+str(i))
+        if (i != j and (sr[i] * sr[j])**3 == identity):
+            eiejsi = F.act_on_variables("s"+str(i)+"e"+str(j)+"e"+str(i))
             print str(i) + " and " + str(j) + " are adjacent..." 
             print ("\ts" + str(i) + "e" + str(j) + "x" \
-                + " = " + str(F._variable_helper.act_on_variables("e"+str(j)+"s"+str(i))))
+                + " = " + str(siej))
             print ("\te" + str(i) + "e" + str(j) + "s" + str(i) + "x" \
-                + " = " + str(F._variable_helper.act_on_variables("s"+str(i)+"e"+str(j)+"e"+str(i))))
+                + " = " + str(eiejsi))
+            # print "\tEqual!" if siej == eiejsi else "\tNot Equal!"
         else:
+            ejsi = F.act_on_variables("s"+str(i)+"e"+str(j))
             print str(i) + " and " + str(j) + " are not adjacent..."
             print ("\ts" + str(i) + "e" + str(j) + "x" \
-                + " = " + str(F._variable_helper.act_on_variables("e"+str(j)+"s"+str(i))))
+                + " = " + str(siej))
             print ("\te" + str(j) + "s" + str(i) + "x" \
-                + " = " + str(F._variable_helper.act_on_variables("s"+str(i)+"e"+str(j))))
+                + " = " + str(ejsi))
+            # print "\tEqual!" if siej == ejsi else "\tNot Equal!"
 
 print
 
 #Act on the monomial by simple reflections
 print "11) Acting on 'm' by simple reflections (Eq. 3.14 on page 9)..."
 for u in W.simple_reflections():
-    print "Reflection " + str(u.reduced_word()) + ": " + str(m.act(u))
+    print "Reflection " + str(u.reduced_word()) + ": " + str(F.act(m,u))
 
 print
 
 #Act by weyl group element on the monomial
-wm = m.act(w)
+wm = F.act(m,w)
 print "12) Acting by 'w' on 'm':\n" + str(wm) + "\n"
 
 print "===============Functionality for Constructing Invariant Function===============\n"
@@ -119,10 +130,18 @@ for w in W.list():
 
 print
 
-#Create delta function
-f0 = F.f0()
-print "15) Creating f0 function (eq. 3.20 page 12):\n" + str(f0) + "\n"
+print "15) Acting on the function '1' in every possible way..."
+for w in W.list():
+    g = F.act(F(1),w)
+    if len(w.reduced_word()) < 2: g.reduce()
+    print "\t" + str(w.reduced_word()) + ": " + (str(g))
+
+print
 
 #Create delta function
-f = F.invariant_function()
-print "16) Creating invariant function (eq. 3.21 page 12):\n" + str(f)
+# f0 = F.f0()
+# print "15) Creating f0 function (eq. 3.20 page 12):\n" + str(f0) + "\n"
+
+#Create delta function
+# f = F.invariant_function()
+# print "16) Creating invariant function (eq. 3.21 page 12):\n" + str(f)
