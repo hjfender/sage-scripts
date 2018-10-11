@@ -4,7 +4,7 @@ from weyl_group_multiple_dirichlet_series_v2.field_of_rational_functions_with_we
 
 #############################################################################
 #Change the Cartan Type to see the effects on the field of rational functions
-R = RootSystem(['A', 3])
+R = RootSystem(['A', 2])
 #############################################################################
 
 #Initialize the field of rational functions off of the given root system
@@ -133,7 +133,8 @@ print
 print "15) Acting on the function '1' in every possible way..."
 for w in W.list():
     g = F.act(F(1),w)
-    if len(w.reduced_word()) < 2: g.reduce()
+    g = F.reduce_function(g)
+    # if len(w.reduced_word()) < 2: g = F.reduce_function(g)
     print "\t" + str(w.reduced_word()) + ": " + (str(g))
 
 print

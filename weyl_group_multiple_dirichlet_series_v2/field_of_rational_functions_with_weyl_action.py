@@ -1,4 +1,5 @@
 from sage.all import *
+from sage.rings.fraction_field_element import make_element
 
 class FieldOfRationalFunctionsWithWeylAction(sage.rings.fraction_field.FractionField_generic):
     """
@@ -189,3 +190,21 @@ class FieldOfRationalFunctionsWithWeylAction(sage.rings.fraction_field.FractionF
         for i in word:
             f = self.simple_action(f, i)
         return f
+
+    ###############################################################
+    #Methods to handle simplification of rational functions
+    ###############################################################
+    def reduce_function(self, f):
+        """
+        """
+        f.reduce() #still need to fix this part - it gets stuck
+        num = f.numerator()
+        den = f.denominator()
+        coeffs = num.coefficients()
+        if(len(coeffs) > 0):
+            new_num = num/coeffs[0]
+            new_den = den/coeffs[0]
+            new_f = make_element(self, new_num, new_den)
+            return new_f
+        else:
+            return f
