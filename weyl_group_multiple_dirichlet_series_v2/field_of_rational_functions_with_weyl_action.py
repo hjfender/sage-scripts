@@ -59,7 +59,7 @@ class FieldOfRationalFunctionsWithWeylAction(sage.rings.fraction_field.FractionF
         """
         f0 = self(0)
         for w in self.weyl_group.list():
-            g = self.j(w) * self.act(self(1),w)
+            g = self.j(w) * self.act(self.one(),w)
             g.reduce()
             f0 += g
         # f0.reduce()
@@ -194,17 +194,103 @@ class FieldOfRationalFunctionsWithWeylAction(sage.rings.fraction_field.FractionF
     ###############################################################
     #Methods to handle simplification of rational functions
     ###############################################################
-    def reduce_function(self, f):
+    def reduce_function(self, function):
         """
         """
-        f.reduce() #still need to fix this part - it gets stuck
-        num = f.numerator()
-        den = f.denominator()
-        coeffs = num.coefficients()
-        if(len(coeffs) > 0):
-            new_num = num/coeffs[0]
-            new_den = den/coeffs[0]
-            new_f = make_element(self, new_num, new_den)
-            return new_f
+        g = self._gcd_numerator_denominator(function.numerator(), function.denominator())
+        if not g.is_unit():
+            num, _ = function.numerator().quo_rem(g)
+            den, _ = function.denominator().quo_rem(g)
         else:
-            return f
+            num = function.numerator()
+            den = function.denominator()
+
+        if not den.is_one() and den.is_unit():
+            num *= den.inverse_of_unit()
+            den  = den.parent().one()
+        
+        return make_element(self, num, den)
+
+    def _gcd_numerator_denominator(self, num, den):
+        """
+        """
+        x = num.parent().gens()[-1]
+        uninumpoly = num.polynomial(x)
+        uninumbase = uninumpoly.base_ring()
+        return self(self._gcd_polynomials(uninumpoly,den.polynomial(x)))
+
+    def _gcd_polynomials(self, f, g):
+        """
+        """
+        if f.degree() < g.degree():
+            A, B = g, f
+        else:
+            A, B = f, g
+
+        if B.is_zero():
+            return A
+
+        a = b = f.parent().zero()
+        for c in A.coefficients():
+            a = a.gcd(c)
+            if a.is_one():
+                break
+        for c in B.coefficients():
+            b = b.gcd(c)
+            if b.is_one():
+                break
+
+        d = a.gcd(b)
+        print ("A; %s \n  B: %s \n a: %s \n b: %s \n d: %s" % (A,B,a,b,d))
+        A = A // a
+        B = B // b
+        g = h = 1
+
+        delta = A.degree() - B.degree()
+        _, R = A.pseudo_quo_rem(B)
+
+        while R.degree() > 0:
+            A = B
+            print ("A: %s \n R: %s \n g: %s \n h: %s \n delta: %s" % (A, R, g, h, delta))
+            B = R // (g * h ** delta)
+            print "B: " + str(B)
+            g = A.leading_coefficient()
+            h = h * g ** delta // h ** delta
+            delta = A.degree() - B.degree()
+            _, R = A.pseudo_quo_rem(B)
+
+        if R.is_zero():
+            b = f.parent().zero()
+            for c in B.coefficients():
+                b = b.gcd(c)
+                if b.is_one():
+                    break
+            return d * B // b
+
+        return f.parent()(d)
+
+    # def _pseudo_quo_rem(self,polynomial,other):
+    # """
+    # """
+    # if other.is_zero():
+    #     raise ZeroDivisionError("Pseudo-division by zero is not possible")
+
+    # # if other is a constant, then R = 0 and Q = self * other^(deg(self))
+    # if other in self.base_ring():
+    #     return (self * other**(A.degree()), self.zero())
+
+    # R = polynomial
+    # B = other
+    # Q = self.zero()
+    # e = polynomial.degree() - other.degree() + 1
+    # d = B.leading_coefficient()
+
+    # while not R.degree() < B.degree():
+    #     c = R.leading_coefficient()
+    #     diffdeg = R.degree() - B.degree()
+    #     Q = d*Q + self(c).shift(diffdeg)
+    #     R = d*R - c*B.shift(diffdeg)
+    #     e -= 1
+
+    # q = d**e
+    # return (q*Q,q*R)

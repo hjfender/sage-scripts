@@ -132,7 +132,7 @@ print
 
 print "15) Acting on the function '1' in every possible way..."
 for w in W.list():
-    g = F.act(F(1),w)
+    g = F.act(F.one(),w)
     g = F.reduce_function(g)
     # if len(w.reduced_word()) < 2: g = F.reduce_function(g)
     print "\t" + str(w.reduced_word()) + ": " + (str(g))
