@@ -1,3 +1,6 @@
+#!/usr/bin/env sage -python
+
+import sys
 from sage.all import *
 from sage.rings.fraction_field_element import make_element
 
@@ -253,7 +256,7 @@ class FieldOfRationalFunctionsWithWeylAction(sage.rings.fraction_field.FractionF
             A = B
             print ("A: %s \n R: %s \n g: %s \n h: %s \n delta: %s" % (A, R, g, h, delta))
             B = R // (g * h ** delta)
-            print "B: " + str(B)
+            print ("B: " + str(B))
             g = A.leading_coefficient()
             h = h * g ** delta // h ** delta
             delta = A.degree() - B.degree()
