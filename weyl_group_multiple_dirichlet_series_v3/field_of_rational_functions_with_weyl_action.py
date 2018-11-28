@@ -17,7 +17,7 @@ class FieldOfRationalFunctionsWithWeylAction(sage.rings.fraction_field.FractionF
         variables = ['sqrtq']
         for i in range(1,self.lattice.dimension() + 1):
             variables.append('x'+str(i))
-        sage.rings.fraction_field.FractionField_generic.__init__(self, PolynomialRing(CC,variables))
+        sage.rings.fraction_field.FractionField_generic.__init__(self, PolynomialRing(ZZ, variables))
 
     def __str__(self):
         return (super(FieldOfRationalFunctionsWithWeylAction, self).__str__() \
@@ -63,14 +63,14 @@ class FieldOfRationalFunctionsWithWeylAction(sage.rings.fraction_field.FractionF
             g = self.j(w) * self.act(self.one(),w)
             g.reduce()
             f0 += g
-        # f0.reduce()
+        f0.reduce()
         return f0
 
     def invariant_function(self):
         """
         """
         function = self.f0()/self.delta()
-        # function.reduce()
+        function.reduce()
         return function
 
 
@@ -192,122 +192,15 @@ class FieldOfRationalFunctionsWithWeylAction(sage.rings.fraction_field.FractionF
             f = self.simple_action(f, i)
         return f
 
+    def act_with_reduction(self, f, w):
+        g = self.act(f, w)
+        g.reduce()
+        return g
+
     ###############################################################
-    #Methods to handle simplification of rational functions
+    #Pretty Print Function
     ###############################################################
-    def reduce_function(self, function):
+    def pretty_print(self, f):
         """
         """
-        g = self._gcd_numerator_denominator(function.numerator(), function.denominator())
-        if not g.is_unit():
-            num, _ = function.numerator().quo_rem(g)
-            den, _ = function.denominator().quo_rem(g)
-        else:
-            num = function.numerator()
-            den = function.denominator()
-
-        if not den.is_one() and den.is_unit():
-            num *= den.inverse_of_unit()
-            den  = den.parent().one()
-        
-        return make_element(self, num, den)
-
-    def _gcd_numerator_denominator(self, num, den):
-        """
-        """
-        R = num.parent()
-        x = R.gens()[-1]
-        uninumpoly = num.polynomial(x)
-        uninumbase = uninumpoly.base_ring()
-        return self(self._gcd_polynomials(uninumpoly,den.polynomial(x),R))
-
-    def _gcd_polynomials(self, f, g, ring):
-        """
-        """
-        x = ring.gens()[-1]
-        if f.degree() < g.degree():
-            A, B = g, f
-        else:
-            A, B = f, g
-
-        if B.is_zero():
-            return A
-
-        a = b = f.parent().zero()
-        for c in A.coefficients():
-            a = a.gcd(c)
-            if a.is_one():
-                break
-        for c in B.coefficients():
-            b = b.gcd(c)
-            if b.is_one():
-                break
-
-        d = a.gcd(b)
-        #print ("A: %s\nB: %s\na: %s\nb: %s\nd: %s" % (A,B,a,b,d))
-        A = ring(A) // ring(a)
-        B = ring(B) // ring(b)
-        A = A.polynomial(x)
-        B = B.polynomial(x)
-        g = h = 1
-
-        delta = A.degree() - B.degree()
-        _, R = self._pseudo_quo_rem(A,B,A.parent())
-
-        while R.degree() > 0:
-            A = B
-            #print ("A: %s\nR: %s\ng: %s\nh: %s\ndelta: %s" % (A,R,g,h,delta))
-            #print "A: " + str(A)
-            B = R // (g * h ** delta)
-            #print "B: " + str(B)
-            g = A.leading_coefficient()
-            #print "g: " + str(g)
-            h = h * g ** delta // h ** delta
-            #print "h: " + str(h)
-            delta = A.degree() - B.degree()
-            #print "delta: " + str(delta)
-            _, R = self._pseudo_quo_rem(A,B,A.parent())
-
-        if R.is_zero():
-            b = f.parent().zero()
-            for c in B.coefficients():
-                b = b.gcd(c)
-                if b.is_one():
-                    break
-            return (d * ring(B) // ring(b)).polynomial(x)
-
-        return f.parent()(d)
-
-    def _pseudo_quo_rem(self, polynomial, other, ring):
-        """
-        """
-        if other.is_zero():
-            raise ZeroDivisionError("Pseudo-division by zero is not possible")
-
-        # if other is a constant, then R = 0 and Q = polynomial * other^(deg(self))
-        if other in ring.base_ring():
-            return (polynomial * other**(A.degree()), ring.zero())
-
-        R = polynomial
-        B = other
-        Q = ring.zero()
-        e = polynomial.degree() - other.degree() + 1
-        d = B.leading_coefficient()
-
-        print polynomial.parent()
-        print other.parent()
-
-        #print ("R: %s\nB: %s\nQ: %s\ne: %s\nd: %s" % (R,B,Q,e,d))
-
-        while not (R.degree() < B.degree()):
-            c = R.leading_coefficient()
-            diffdeg = R.degree() - B.degree()
-            Q = d*Q + ring(c).shift(diffdeg)
-            R = d*R - c*B.shift(diffdeg)
-            e -= 1
-            #print "\tR: %s\n\tB: %s" % (R,B)
-            #print "R degree: %s, B degree: %s" % (R.degree(),B.degree()) 
-            #print ("R: %s\nc: %s\ndiffdeg: %s\nQ: %s\nR: %s\ne: %s" % (R,c,diffdeg,Q,R,e))
-
-        q = d**e
-        return (q*Q,q*R)
+        print f
