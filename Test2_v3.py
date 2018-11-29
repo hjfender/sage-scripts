@@ -4,20 +4,18 @@ from weyl_group_multiple_dirichlet_series_v3.field_of_rational_functions_with_we
 
 #############################################################################
 #Change the Cartan Type to see the effects on the field of rational functions
-R = RootSystem(['A', 2])
+cartan = 'F'
+n = 4
+
+R = RootSystem([cartan, n])
 #############################################################################
 
 #Initialize the field of rational functions off of the given root system
 F = FieldOfRationalFunctionsWithWeylAction(R)
 
-print "==========f=========="
 f = F.invariant_function()
-print f
-print f.parent()
-F.pretty_print_CF(f)
-
-print "==========g=========="
-g = F(f)
-print g
-print g.parent()
-F.pretty_print(g)
+fp = F.pretty_print_CF(f)
+filename = "output/" + cartan + str(n) + ".txt"
+func_file = open(filename,"w+")
+func_file.write(str(fp))
+func_file.close()

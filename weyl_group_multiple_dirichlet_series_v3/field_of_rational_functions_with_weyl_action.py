@@ -201,22 +201,28 @@ class FieldOfRationalFunctionsWithWeylAction(sage.rings.fraction_field.FractionF
         return g
 
     ###############################################################
-    #Convert from computation field to actual field
+    #Pretty print and convert to symbolic ring
     ###############################################################
     def pretty_print_CF(self, f):
         """
         """
         variables = [self.CF(x) for x in self.CF.variable_names()]
         variables[0] = sqrt(var('q'))
-        result = f(variables)
-        print "Numerator: " + str(result.numerator())
-        print "Denominator: " + str(result.denominator())
+        result = f(variables).factor()
+        try:
+            print "Numerator: " + str(result.numerator())
+            print "Denominator: " + str(result.denominator())
+        except:
+            print "Result: " + str(result)
 
     def pretty_print(self, f):
         """
         """
         variables = [self(x) for x in self.variable_names()]
         variables[0] = sqrt(var('q'))
-        result = f(variables)
-        print "Numerator: " + str(result.numerator())
-        print "Denominator: " + str(result.denominator())
+        result = f(variables).factor()
+        try:
+            print "Numerator: " + str(result.numerator())
+            print "Denominator: " + str(result.denominator())
+        except:
+            print "Result: " + str(result)
