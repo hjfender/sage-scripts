@@ -1,6 +1,6 @@
 #!/usr/bin/env sage -python
 
-from weyl_group_multiple_dirichlet_series_v3.field_of_rational_functions_with_weyl_action import *
+from weyl_group_multiple_dirichlet_series_v4.field_of_rational_functions_with_weyl_action import *
 
 #############################################################################
 #Change the Cartan Type to see the effects on the field of rational functions
