@@ -4,8 +4,8 @@ from weyl_group_multiple_dirichlet_series_v3.field_of_rational_functions_with_we
 
 #############################################################################
 #Change the Cartan Type to see the effects on the field of rational functions
-cartan = 'F'
-n = 4
+cartan = 'D'
+n = 5
 
 R = RootSystem([cartan, n])
 #############################################################################
