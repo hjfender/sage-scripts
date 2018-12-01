@@ -2,7 +2,7 @@
 
 import numpy as np
 from sage.all import *
-from functions import a5 as func
+from functions import b4 as func
 
 def create_func(F,f,q,x,n,m):
     input = [0 for y in F.variable_names()];
@@ -25,5 +25,5 @@ def create_func(F,f,q,x,n,m):
 
 x = var('x');
 y = var('y');
-p = contour_plot(func.f(sqrt(100),x,y,0,0,0),(x,-2,2),(y,-2,2),contours=np.arange(-10, 10, 0.1));
+p = contour_plot(func.f(sqrt(100),0,x,y,0),(x,-2,2),(y,-2,2),contours=np.arange(-10, 10, 0.1));
 show(p);
